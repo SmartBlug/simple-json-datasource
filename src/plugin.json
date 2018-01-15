@@ -13,7 +13,7 @@
   "info": {
     "description": "simple json datasource",
     "author": {
-      "name": "Grafana Labs",
+      "name": "Grafana Labs modified by Patrick Bouffel",
       "url": "https://grafana.com"
     },
     "logos": {

@@ -67,15 +67,27 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
           var _this = _possibleConstructorReturn(this, (GenericDatasourceQueryCtrl.__proto__ || Object.getPrototypeOf(GenericDatasourceQueryCtrl)).call(this, $scope, $injector));
 
           _this.scope = $scope;
+
           _this.target.target = _this.target.target || 'select metric';
           _this.target.type = _this.target.type || 'timeserie';
+
+					this.datasource.metricFindSources().then(function (result) {
+						$scope.sources = []
+						for (let source of result) {
+						  $scope.sources.push({'name':source});
+						}
+						//$scope.mysource = $scope.sources[0]; // red
+						_this.target.source = $scope.sources[0];
+					});
+
           return _this;
         }
 
         _createClass(GenericDatasourceQueryCtrl, [{
           key: 'getOptions',
-          value: function getOptions(query) {
-            return this.datasource.metricFindQuery(query || '');
+          value: function getOptions(query,source) {
+          	if (source) console.log("getOptions",query,source.name);
+            if (source) return this.datasource.metricFindQuery(query || '',source.name);
           }
         }, {
           key: 'toggleEditorMode',
@@ -85,6 +97,7 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
         }, {
           key: 'onChangeInternal',
           value: function onChangeInternal() {
+          	console.log("onChangeInternal");
             this.panelCtrl.refresh(); // Asks the panel to refresh data.
           }
         }]);

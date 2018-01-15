@@ -55,6 +55,7 @@ System.register(['lodash'], function (_export, _context) {
           key: 'query',
           value: function query(options) {
             var query = this.buildQueryParameters(options);
+            console.log("query",query)
             query.targets = query.targets.filter(function (t) {
               return !t.hide;
             });
@@ -70,6 +71,36 @@ System.register(['lodash'], function (_export, _context) {
             });
           }
         }, {
+          key: 'querySources',
+          value: function querySources(options) {
+            // Metric is not selected
+            if (options.metric == 'select metric') {
+              return new Promise(function (resolve, reject) {
+                reject("metric not selected");
+              });
+            }
+
+            var uuid = options.UUIDs[options.metric];
+            return this.backendSrv.datasourceRequest({
+              url: this.url + '/registry/' + uuid,
+              method: 'GET'
+              //headers: { 'Content-Type': 'application/json' }
+            }).then(this.convertSources);
+          }
+        }, {
+          key: 'FindSources',
+          value: function metricFindQuery(query) {
+            var interpolated = {
+              target: this.templateSrv.replace(query, null, 'regex')
+            };
+
+            return this.doRequest({
+              url: this.url + '/sources',
+              data: interpolated,
+              method: 'POST'
+            }).then(this.mapToTextValue);
+          }
+        },  {
           key: 'testDatasource',
           value: function testDatasource() {
             return this.doRequest({
@@ -107,9 +138,10 @@ System.register(['lodash'], function (_export, _context) {
           }
         }, {
           key: 'metricFindQuery',
-          value: function metricFindQuery(query) {
+          value: function metricFindQuery(query,source) {
             var interpolated = {
-              target: this.templateSrv.replace(query, null, 'regex')
+              target: this.templateSrv.replace(query, null, 'regex'),
+              source: this.templateSrv.replace(source, null, 'regex')
             };
 
             return this.doRequest({
@@ -117,6 +149,20 @@ System.register(['lodash'], function (_export, _context) {
               data: interpolated,
               method: 'POST'
             }).then(this.mapToTextValue);
+          }
+        }, {
+          key: 'metricFindSources',
+          value: function metricFindQuery() {
+            
+            return this.doRequest({
+              url: this.url + '/sources',
+              //data: interpolated,
+              method: 'POST'
+            }).then(function (result) {
+            	//console.log(result);
+            	//this.brutsources=result.data;
+              return result.data;
+            });//.then(this.mapToTextValue);
           }
         }, {
           key: 'mapToTextValue',
@@ -153,7 +199,8 @@ System.register(['lodash'], function (_export, _context) {
                 target: _this.templateSrv.replace(target.target, options.scopedVars, 'regex'),
                 refId: target.refId,
                 hide: target.hide,
-                type: target.type || 'timeserie'
+                type: target.type || 'timeserie',
+                source: target.source?target.source.name:''
               };
             });
 

@@ -3,6 +3,9 @@
     <div class="gf-form max-width-8">
       <select class="gf-form-input" ng-model="ctrl.target.type" ng-options="f as f for f in ['table', 'timeserie']"></select>
     </div>
+    <div class="gf-form">
+	    <select ng-model="ctrl.target.source" ng-options="source.name for source in sources"></select>
+    </div>
 
     <div class="gf-form" ng-if="ctrl.target.rawQuery">
       <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()" />
@@ -13,7 +16,7 @@
         <gf-form-dropdown model="ctrl.target.target"
           allow-custom="true"
           lookup-text="true"
-          get-options="ctrl.getOptions($query)"
+          get-options="ctrl.getOptions($query,ctrl.target.source)"
           on-change="ctrl.onChangeInternal()">
       </gf-form-dropdown>
       </div>
@@ -22,4 +25,5 @@
       <div class="gf-form-label gf-form-label--grow"></div>
     </div>
   </div>
+
 </query-editor-row>
